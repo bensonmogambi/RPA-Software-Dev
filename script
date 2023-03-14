@@ -1,0 +1,26 @@
+import database_library
+import pdf_library
+import email_library
+
+# Connect to the database
+db_connection = database_library.connect()
+
+# Retrieve customer data
+customer_data = database_library.query_customers(db_connection)
+
+# Loop through customer data
+for customer in customer_data:
+    # Retrieve product data
+    product_data = database_library.query_products(db_connection, customer["id"])
+    
+    # Calculate total amount due
+    total_amount_due = calculate_total_amount_due(product_data)
+    
+    # Generate invoice PDF document
+    invoice_pdf = pdf_library.generate_invoice_pdf(customer, product_data, total_amount_due)
+    
+    # Send invoice to customer via email
+    email_library.send_email(customer["email"], "Invoice", invoice_pdf)
+    
+# Close the database connection
+database_library.close(db_connection)
